@@ -13,17 +13,16 @@ class Utilities {
 	 * Reliably generate a unique cache key, but something that could be rebuilt if necessary.
 	 *
 	 * @param string $name A unique name for the cached data.
-	 * @param array $context An array representing values that may change and will require a unique cache key.
+	 * @param array $context An associative array representing values that may change and will require a unique cache key.
 	 *
 	 * @return string
 	 */
 	public static function generateCacheKey( $name, array $context = [] ) {
 		if ( ! empty( $context ) ) {
 			if ( array_values( $context ) === $context ) {
-				asort( $context );
-			} else {
-				ksort( $context );
+				throw new \InvalidArgumentException( 'Expected an associative array, but received a numerically indexed array' );
 			}
+			ksort( $context );
 			$name = $name . '?' . http_build_query( $context, null, '&' );
 		}
 
