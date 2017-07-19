@@ -31,6 +31,66 @@ class Utilities {
 	}
 
 	/**
+	 * Returns a nav menu object by location name.
+	 *
+	 * @param string $location Nav menu location name
+	 *
+	 * @return false|\WP_Term Returns WP_Term object if menu exists, false otherwise.
+	 */
+	public static function getNavMenuByLocation( $location ) {
+
+		global $_wp_registered_nav_menus;
+
+		$nav_menu = false;
+
+		if ( has_nav_menu( $location ) ) {
+			$nav_menu = wp_get_nav_menu_object( $_wp_registered_nav_menus[ $location ] );
+		}
+
+		return $nav_menu;
+	}
+
+	/**
+	 * Returns a collection of nav menu items.
+	 *
+	 * @param string $location Nav menu location name.
+	 * @param array $args Optional. Arguments to pass to get_posts().
+	 *
+	 * @return array
+	 */
+	public static function getNavMenuItemsByLocation( $location, array $args = [] ) {
+
+		global $_wp_registered_nav_menus;
+
+		$nav_menu_items = [];
+		if ( has_nav_menu( $location ) ) {
+			$nav_menu_items = wp_get_nav_menu_items( $_wp_registered_nav_menus[ $location ], $args );
+		}
+
+		return $nav_menu_items;
+	}
+
+	/**
+	 * Get a post's featured image URL for a specific image size.
+	 *
+	 * @param \WP_Post|int $post
+	 * @param string $size
+	 *
+	 * @return string Returns a URL, or an empty string if there is no featured image.
+	 */
+	public static function getPostThumbnailUrl( $post, $size = 'full' ) {
+		$url = '';
+		if ( has_post_thumbnail( $post ) ) {
+			$image = wp_get_attachment_image_src( get_post_thumbnail_id( $post ), $size );
+			if ( isset( $image[0] ) ) {
+				$url = $image[0];
+			}
+		}
+
+		return $url;
+	}
+
+	/**
 	 * Load a template with context.
 	 *
 	 * @param string|array $template Template name(s)
