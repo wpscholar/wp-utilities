@@ -108,18 +108,27 @@ class Utilities {
 	 *
 	 * @return \Generator
 	 */
-	public static function loop( $iterable ) {
+	public static function loop( $iterable = null ) {
 
-		$posts = [];
+		if ( is_null( $iterable ) ) {
+			$iterable = $GLOBALS['wp_query'];
+		}
+
 		if ( is_array( $iterable ) ) {
 			$posts = $iterable;
-		} else if ( property_exists( $iterable, 'posts' ) ) {
+		} else if ( is_object( $iterable ) && property_exists( $iterable, 'posts' ) ) {
 			$posts = $iterable->posts;
+		} else {
+			$type = gettype( $iterable );
+			$msg  = "Expected null, WP_Query object or an array of WP_Post objects, received {$type} instead";
+			throw new \InvalidArgumentException( $msg );
 		}
 
 		global $post;
+
 		// Save a copy of current global post
 		$save_post = $post;
+
 		try {
 			foreach ( $posts as $post ) {
 				// Setup post data (also sets global context)
