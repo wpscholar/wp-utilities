@@ -10,6 +10,28 @@ namespace wpscholar\WordPress;
 class Utilities {
 
 	/**
+	 * Get the timezone
+	 *
+	 * @return \DateTimeZone
+	 */
+	public static function getTimeZone() {
+		$tzstring = get_option( 'timezone_string' );
+		if ( empty( $tzstring ) ) {
+			$offset = intval( get_option( 'gmt_offset' ) );
+			if ( 0 !== $offset ) {
+				$tzstring = 'Etc/GMT' . ( $offset > 0 ? '-' : '+' ) . $offset;
+			}
+		}
+		if ( empty( $tzstring ) ) {
+			$tzstring = 'UTC';
+		}
+
+		$timezone = new \DateTimeZone( $tzstring );
+
+		return $timezone;
+	}
+
+	/**
 	 * Reliably generate a unique cache key, but something that could be rebuilt if necessary.
 	 *
 	 * @param string $name A unique name for the cached data.
