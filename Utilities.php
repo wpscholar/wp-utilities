@@ -153,6 +153,9 @@ class Utilities {
 
 		try {
 			foreach ( $posts as $post ) {
+				if ( is_numeric( $post ) ) {
+					$post = get_post( $post );
+				}
 				// Setup post data (also sets global context)
 				setup_postdata( $post );
 				yield $post;
