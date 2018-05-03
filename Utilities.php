@@ -42,9 +42,9 @@ class Utilities {
 	public static function generateCacheKey( $name, array $context = [] ) {
 		if ( ! empty( $context ) ) {
 			if ( array_values( $context ) === $context ) {
-				throw new \InvalidArgumentException( 'Expected an associative array, but received a numerically indexed array' );
+				throw new \InvalidArgumentException( 'Expected an associative array, but received a numerically indexed array.' );
 			}
-			ksort( $context );
+			ksort( $context, SORT_STRING );
 			$name = $name . '?' . http_build_query( $context, null, '&' );
 		}
 
@@ -117,22 +117,26 @@ class Utilities {
 	 * @param string|array $template Template name(s)
 	 * @param array $context Array containing variable name and value pairs.
 	 */
-	public static function loadTemplateWithContext( $template, $context = [] ) {
+	public static function loadTemplateWithContext( $template, array $context = [] ) {
 		extract( $context, EXTR_SKIP );
-		include locate_template( $template );
+		$template_file = locate_template( $template );
+		if ( $template_file ) {
+			include $template_file;
+		}
 	}
 
 	/**
 	 * A PHP generator that can be used to iterate through a collection of posts.
-	 * Essentially, the WordPress loop can be replaced with a simple foreach.
+	 * Essentially, the WordPress loop can be replaced with a simple foreach. You can provide
+	 * a query, array of posts, array of post IDs, or allow it to default to the global query.
 	 *
-	 * @param \WP_Query|\WP_Post[] $iterable
+	 * @param \WP_Query|\WP_Post[]|int[] $iterable
 	 *
 	 * @return \Generator
 	 */
 	public static function loop( $iterable = null ) {
 
-		if ( is_null( $iterable ) ) {
+		if ( null === $iterable ) {
 			$iterable = $GLOBALS['wp_query'];
 		}
 
@@ -142,7 +146,7 @@ class Utilities {
 			$posts = $iterable->posts;
 		} else {
 			$type = gettype( $iterable );
-			$msg  = "Expected null, WP_Query object or an array of WP_Post objects, received {$type} instead";
+			$msg = "Expected null, WP_Query object or an array of WP_Post objects, received {$type} instead";
 			throw new \InvalidArgumentException( $msg );
 		}
 
@@ -164,7 +168,6 @@ class Utilities {
 			wp_reset_postdata();
 			// Restore global post
 			$post = $save_post;
-
 		}
 
 	}
