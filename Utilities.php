@@ -116,8 +116,12 @@ class Utilities {
 	 *
 	 * @param string|array $template Template name(s)
 	 * @param array $context Array containing variable name and value pairs.
+	 * @param string $extension Type of file extension to load, defaults to PHP file extension.
 	 */
-	public static function loadTemplateWithContext( $template, array $context = [] ) {
+	public static function loadTemplateWithContext( $template, array $context = [], $extension = '.php' ) {
+		if ( ! strpos( $template, $extension, - strlen( $extension ) ) ) {
+			$template .= $extension;
+		}
 		extract( $context, EXTR_SKIP );
 		$template_file = locate_template( $template );
 		if ( $template_file ) {
